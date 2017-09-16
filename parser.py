@@ -238,7 +238,7 @@ def preprocess_url(url):
     return result['url'], result
 
 
-def format_traceback(exc, exc_traceback):
+def prepare_traceback(exc, exc_traceback):
     filename = line = None
 
     while exc_traceback is not None:
@@ -247,14 +247,14 @@ def format_traceback(exc, exc_traceback):
         filename = f.f_code.co_filename
         exc_traceback = exc_traceback.tb_next
 
-    return json.dumps({
+    return {
         'error': True,
         'details': {
             'message': str(exc),
             'file': filename,
             'line': line
         }
-    }, ensure_ascii=False)
+    }
 
 
 def parser_worker(request_q, reply_q, parsing_delay=DEFAULT_PARSING_DELAY):
@@ -277,7 +277,7 @@ def parser_worker(request_q, reply_q, parsing_delay=DEFAULT_PARSING_DELAY):
             reply_q.put(result)
         except Exception, e:
             setproctitle('Report %s' % e.message)
-            reply_q.put(format_traceback(e, sys.exc_info()[2]))
+            reply_q.put(prepare_traceback(e, sys.exc_info()[2]))
 
 
 if __name__ == '__main__':
@@ -339,15 +339,17 @@ if __name__ == '__main__':
                     request_queue.put((processed_url, result))
             except Exception, e:
                 exc_traceback = sys.exc_info()[2]
-                sys.stderr.write(format_traceback(e, exc_traceback) + '\n')
+                stderr.write(prepare_traceback(e, exc_traceback) + '\n')
 
         while not result_queue.empty() or outstanding_requests > 0:
             result = result_queue.get()
 
             if result:
-                stdout.write(json.dumps(result, ensure_ascii=False))
-                stdout.write('\n')
-                stdout.flush()
+                sink = stderr if 'error' in result else stdout
+
+                sink.write(json.dumps(result, ensure_ascii=False))
+                sink.write('\n')
+                sink.flush()
 
             outstanding_requests -= 1
 
