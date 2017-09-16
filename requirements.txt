@@ -1,0 +1,4 @@
+setproctitle
+arrow
+requests
+BeautifulSoup

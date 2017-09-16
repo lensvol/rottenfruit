@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title" : "validation schema / Rotten Tomatoes",
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string",
+      "pattern" : "^https?://"
+    },
+    "rtomat_id": {
+      "type": "string"
+    },
+    "rtt": {
+      "type": "string"
+    },
+    "season": {
+      "type": "string",
+      "pattern" : "\\d+"
+    },
+    "original_title": {
+      "type": "string"
+    },
+    "year": {
+      "type": "integer"
+    },
+    "reviews": {
+      "type": "integer"
+    },
+    "fresh": {
+      "type": "integer"
+    },
+    "rotten": {
+      "type": "integer"
+    },
+    "rating": {
+      "type": "string",
+      "pattern" : "[0-9.,/]+"
+    },
+    "percent": {
+      "type": "integer"
+    },
+    "actualization_date": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties" : false,
+  "required": [
+    "url",
+    "rtomat_id",
+    "rtt",
+    "original_title",
+    "year",
+    "actualization_date"
+  ]
+}
